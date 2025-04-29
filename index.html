@@ -1,0 +1,117 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Academic Profile - Xin Zhang</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+            color: #000000; /* Body text remains black */
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #000000; /* Changed to black */
+            text-align: center;
+            font-size: 2em;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: #000000; /* Changed to black */
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+        p {
+            line-height: 1.6;
+            font-size: 1em;
+        }
+        .profile-pic {
+            display: block;
+            margin: 0 auto 20px;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #000000; /* Updated border to black to match title */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Profile Photo -->
+        <img src="./profile.jpg" alt="Profile Photo of Xin Zhang" class="profile-pic">
+
+        <!-- English Name -->
+        <h1>Xin Zhang</h1>
+
+        <!-- Personal Introduction -->
+        <div class="section intro">
+            <h2>Introduction</h2>
+            <p>My name is Xin Zhang, a 24-year-old male graduate student pursuing a Master's degree at the School of Information Science and Engineering, Shandong Normal University. I hold a Bachelor's degree in Computer Science and Technology from Dalian Jiaotong University, where I developed a strong foundation in computational theory and software development. My primary research interest lies in the field of fully homomorphic encryption (FHE), with a focus on its applications in secure computation and data privacy. I am passionate about advancing cryptographic techniques to address real-world challenges in secure data processing and privacy-preserving technologies.</p>
+        </div>
+
+        <!-- Current Research Projects -->
+        <div class="section projects">
+            <h2>Research Projects</h2>
+            <p>I am currently engaged in a research project under the guidance of my advisor, exploring the intersection of homomorphic encryption and machine learning, with a particular emphasis on natural language processing (NLP). My work focuses on the integration of fully homomorphic encryption (FHE) with Transformer-based models to enable secure and privacy-preserving inference in NLP applications. This involves designing and implementing Transformer inference modules that operate under FHE constraints, ensuring data confidentiality while maintaining computational efficiency. The project aims to develop scalable solutions for secure NLP tasks, such as text classification and sentiment analysis, in privacy-sensitive domains like healthcare and finance.</p>
+        </div>
+
+        <!-- Contact Information -->
+        <div class="section contact">
+            <h2>Contact</h2>
+            <p>For inquiries or collaboration opportunities, please reach out to me via email at <a href="mailto:colinz@gmail.com">colinz@gmail.com</a>. I am open to discussions regarding research in cryptography, machine learning, and related fields.</p>
+        </div>
+    </div>
+</body>
+</html>
